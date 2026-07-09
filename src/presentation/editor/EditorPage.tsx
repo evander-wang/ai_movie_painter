@@ -7,6 +7,7 @@ import {
   Edge,
   MiniMap,
   Node,
+  OnSelectionChangeParams,
   ReactFlow,
   ReactFlowProvider,
   useEdgesState,
@@ -16,6 +17,7 @@ import {
 import { projectConfig } from '@/config/projectConfig';
 import { arrangeCanvasNodes } from '@/application/canvas/arrangeCanvas';
 import { markActivePathEdges } from '@/application/canvas/activePath';
+import type { EditorRouteState } from '@/application/canvas/editorRouteState';
 import { buildCanvasExportPayload, parseImportedCanvas } from '@/application/canvas/importExportCanvas';
 import { getNextZoomIn, getNextZoomOut } from '@/application/canvas/viewportCommands';
 import { createWorkflowNode } from '@/application/workflow/createWorkflowNode';
@@ -39,31 +41,44 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 const initialNodes: Node<FlowNodeData>[] = createDefaultCanvasNodes() as Node<FlowNodeData>[];
 const initialFlowEdges: Edge[] = initialEdges as Edge[];
 
-export function EditorPage() {
+type EditorPageProps = {
+  routeState?: EditorRouteState;
+  onRouteStateChange?: (state: EditorRouteState) => void;
+};
+
+export function EditorPage(props: EditorPageProps) {
   return (
     <ReactFlowProvider>
-      <CanvasPrototype />
+      <CanvasPrototype {...props} />
     </ReactFlowProvider>
   );
 }
 
-function CanvasPrototype() {
+function CanvasPrototype({ routeState, onRouteStateChange }: EditorPageProps) {
   const reactFlow = useReactFlow<Node<FlowNodeData>, Edge>();
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const routeNodeId = routeState?.nodeId ?? null;
+  const initialZoom = routeState?.zoom ?? projectConfig.canvas.defaultViewport.zoom;
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<FlowNodeData>>(createInitialCanvasNodes(routeNodeId));
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialFlowEdges);
   const importInputRef = useRef<HTMLInputElement | null>(null);
-  const [panel, setPanel] = useState<Panel>(null);
+  const [panel, setPanelState] = useState<Panel>(routeState?.panel ?? null);
   const [nodePopover, setNodePopover] = useState<NodePopover>(null);
-  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(() =>
+    getVideoNodeId(initialNodes, routeNodeId),
+  );
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(routeNodeId);
   const [selectedAnchor, setSelectedAnchor] = useState<AnchorRect | null>(null);
   const [showMiniMap, setShowMiniMap] = useState(false);
   const [snap, setSnap] = useState(true);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [zoomPercent, setZoomPercent] = useState(58);
+  const [zoomPercent, setZoomPercent] = useState(Math.round(initialZoom * 100));
   const readEditorViewport = useCallback(
     () => readCurrentViewport(projectConfig.canvas.defaultViewport.zoom),
     [],
+  );
+  const defaultViewport = useMemo(
+    () => ({ ...projectConfig.canvas.defaultViewport, zoom: initialZoom }),
+    [initialZoom],
   );
 
   const onConnect = useCallback(
@@ -77,6 +92,10 @@ function CanvasPrototype() {
 
   useMagneticHandles(isConnecting);
 
+  const setPanel = useCallback((nextPanel: Panel) => {
+    setPanelState(nextPanel);
+  }, []);
+
   const selectNodeById = useCallback((id: string, kind: FlowNodeData['kind']) => {
     setSelectedNodeId(id);
     setSelectedVideoId(kind === 'video' ? id : null);
@@ -88,7 +107,14 @@ function CanvasPrototype() {
         if (rect) setSelectedAnchor(rect);
       });
     });
-  }, []);
+  }, [setPanel]);
+
+  const handleFlowSelectionChange = useCallback(({ nodes: selectedNodes }: OnSelectionChangeParams) => {
+    const selectedFlowNode = selectedNodes[0] as Node<FlowNodeData> | undefined;
+    if (!selectedFlowNode) return;
+    if (selectedFlowNode.id === selectedNodeId) return;
+    selectNodeById(selectedFlowNode.id, selectedFlowNode.data.kind);
+  }, [selectNodeById, selectedNodeId]);
 
   const addWorkflowNode = useCallback((nodeType: AiNodeType) => {
     const config = nodeCatalog[nodeType];
@@ -209,6 +235,53 @@ function CanvasPrototype() {
     return () => window.removeEventListener('prototype-node-select', handleNodeSelect);
   }, []);
 
+  useEffect(() => {
+    if (!onRouteStateChange) return;
+    onRouteStateChange({
+      nodeId: selectedNodeId,
+      panel,
+      zoom: zoomPercent / 100,
+    });
+  }, [onRouteStateChange, panel, selectedNodeId, zoomPercent]);
+
+  useEffect(() => {
+    const nextNodeId = routeState?.nodeId ?? null;
+    if (nextNodeId === selectedNodeId) return;
+
+    const nextNode = nextNodeId ? nodes.find((node) => node.id === nextNodeId) : undefined;
+    setSelectedNodeId(nextNode?.id ?? null);
+    setSelectedVideoId(nextNode?.data.kind === 'video' ? nextNode.id : null);
+    setSelectedAnchor(null);
+    setNodePopover(null);
+  }, [nodes, routeState?.nodeId, selectedNodeId]);
+
+  useEffect(() => {
+    const nextPanel = routeState?.panel ?? null;
+    setPanelState((currentPanel) => (currentPanel === nextPanel ? currentPanel : nextPanel));
+  }, [routeState?.panel]);
+
+  useEffect(() => {
+    if (!routeState?.zoom) return;
+    const nextZoomPercent = Math.round(routeState.zoom * 100);
+    if (nextZoomPercent === zoomPercent) return;
+
+    setZoomPercent(nextZoomPercent);
+    requestAnimationFrame(() => {
+      const viewport = readEditorViewport();
+      reactFlow.setViewport({ ...viewport, zoom: routeState.zoom! }, { duration: 180 });
+    });
+  }, [reactFlow, readEditorViewport, routeState?.zoom, zoomPercent]);
+
+  useEffect(() => {
+    if (!selectedNodeId) return;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const rect = getNodeDomRectById(selectedNodeId);
+        if (rect) setSelectedAnchor(rect);
+      });
+    });
+  }, [selectedNodeId]);
+
   return (
     <div className="app-shell">
       <input
@@ -234,7 +307,13 @@ function CanvasPrototype() {
           onConnect={onConnect}
           onConnectStart={() => setIsConnecting(true)}
           onConnectEnd={() => setIsConnecting(false)}
-          onMove={(_, viewport) => setZoomPercent(Math.round(viewport.zoom * 100))}
+          onSelectionChange={handleFlowSelectionChange}
+          onMove={(_, viewport) => {
+            const nextZoomPercent = Math.round(viewport.zoom * 100);
+            setZoomPercent((currentZoomPercent) =>
+              currentZoomPercent === nextZoomPercent ? currentZoomPercent : nextZoomPercent,
+            );
+          }}
           onNodeClick={(_, node) => {
             setNodePopover(null);
             setPanel(null);
@@ -249,7 +328,7 @@ function CanvasPrototype() {
             setSelectedAnchor(null);
             setNodePopover(null);
           }}
-          defaultViewport={projectConfig.canvas.defaultViewport}
+          defaultViewport={defaultViewport}
           minZoom={projectConfig.canvas.minZoom}
           maxZoom={projectConfig.canvas.maxZoom}
           snapToGrid={snap}
@@ -315,4 +394,17 @@ function CanvasPrototype() {
       />
     </div>
   );
+}
+
+function createInitialCanvasNodes(selectedNodeId: string | null): Node<FlowNodeData>[] {
+  return initialNodes.map((node) => ({
+    ...node,
+    selected: selectedNodeId ? node.id === selectedNodeId : node.selected,
+  }));
+}
+
+function getVideoNodeId(nodes: Node<FlowNodeData>[], selectedNodeId: string | null): string | null {
+  if (!selectedNodeId) return null;
+  const selectedNode = nodes.find((node) => node.id === selectedNodeId);
+  return selectedNode?.data.kind === 'video' ? selectedNode.id : null;
 }
