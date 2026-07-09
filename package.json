@@ -7,7 +7,7 @@
     "dev": "vite",
     "typecheck": "tsc -b --noEmit",
     "arch:check": "depcruise --config .dependency-cruiser.cjs src",
-    "test:unit": "vitest run tests/application",
+    "test:unit": "vitest run tests/application tests/presentation",
     "test:golden": "vitest run tests/golden",
     "build": "tsc -b && vite build",
     "check:all": "npm run typecheck && npm run arch:check && npm run test:unit && npm run test:golden && npm run build",
