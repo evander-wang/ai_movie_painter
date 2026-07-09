@@ -44,4 +44,26 @@ test.describe('editor smoke', () => {
     await expect(page.locator('.node-attribute-popover')).toBeVisible();
     await expect(page.locator('.node-attribute-popover')).toContainText('图片参考 4');
   });
+
+  test('keeps the attribute popover closed after pressing its close button', async ({ page }) => {
+    await page.goto('/editor?node=default-text&zoom=135');
+
+    await expect(page.locator('.node-attribute-popover')).toBeVisible();
+    await page.locator('.node-attribute-popover .attribute-head button').click();
+
+    await expect(page).toHaveURL(/\/editor\?zoom=135$/);
+    await expect(page.locator('.node-attribute-popover')).toBeHidden();
+  });
+
+  test('adds a workflow node from the node menu without crashing', async ({ page }) => {
+    await page.goto('/editor');
+
+    await page.getByTitle('添加节点').click();
+    await page.getByRole('button', { name: /风格参考/ }).click();
+
+    await expect(page).toHaveURL(/\/editor\?node=styleReference-/);
+    await expect(page.locator('.app-shell')).toBeVisible();
+    await expect(page.locator('.react-flow__node')).toHaveCount(13);
+    await expect(page.locator('.node-attribute-popover')).toContainText('风格参考');
+  });
 });

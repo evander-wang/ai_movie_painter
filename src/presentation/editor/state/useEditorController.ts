@@ -7,7 +7,7 @@ import {
   useEdgesState,
   useNodesState,
 } from '@xyflow/react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { arrangeCanvasNodes } from '@/application/canvas/arrangeCanvas';
 import { markActivePathEdges } from '@/application/canvas/activePath';
 import type { EditorRouteState } from '@/application/canvas/editorRouteState';
@@ -22,7 +22,7 @@ import type { AnchorRect } from '@/shared/geometry/overlayPosition';
 import type { NodePopover, Panel } from '@/presentation/editor/editorTypes';
 import { useCanvasImportExport } from '@/presentation/editor/state/useCanvasImportExport';
 import { useCanvasViewport } from '@/presentation/editor/state/useCanvasViewport';
-import { createInitialCanvasNodes, getVideoNodeId } from '@/presentation/editor/state/editorSelection';
+import { createInitialCanvasNodes, getVideoNodeId, markSelectedCanvasNode } from '@/presentation/editor/state/editorSelection';
 import { useEditorRouteState } from '@/presentation/editor/state/useEditorRouteState';
 import { useMagneticHandles } from '@/presentation/editor/state/useMagneticHandles';
 
@@ -51,6 +51,7 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
   const [showMiniMap, setShowMiniMap] = useState(false);
   const [snap, setSnap] = useState(true);
   const [isConnecting, setIsConnecting] = useState(false);
+  const isClearingSelectionRef = useRef(false);
   const viewport = useCanvasViewport(initialZoom);
 
   useMagneticHandles(isConnecting);
@@ -59,16 +60,36 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
     setPanelState(nextPanel);
   }, []);
 
+  const setSelectedFlowNodeId = useCallback((id: string | null) => {
+    setSelectedNodeId((currentId) => (currentId === id ? currentId : id));
+    setNodes((currentNodes) => markSelectedCanvasNode(currentNodes, id));
+  }, [setNodes]);
+
   const resetEditorState = useCallback(() => {
-    setSelectedNodeId(null);
+    setSelectedFlowNodeId(null);
     setSelectedVideoId(null);
     setSelectedAnchor(null);
     setNodePopover(null);
     setPanel(null);
-  }, [setPanel]);
+  }, [setPanel, setSelectedFlowNodeId]);
+
+  const clearSelection = useCallback(() => {
+    isClearingSelectionRef.current = true;
+    setSelectedVideoId(null);
+    setSelectedFlowNodeId(null);
+    setSelectedAnchor(null);
+    setNodePopover(null);
+
+    requestAnimationFrame(() => {
+      setSelectedFlowNodeId(null);
+      requestAnimationFrame(() => {
+        isClearingSelectionRef.current = false;
+      });
+    });
+  }, [setSelectedFlowNodeId]);
 
   const selectNodeById = useCallback((id: string, kind: FlowNodeData['kind']) => {
-    setSelectedNodeId(id);
+    setSelectedFlowNodeId(id);
     setSelectedVideoId(kind === 'video' ? id : null);
     setNodePopover(null);
     setPanel(null);
@@ -78,43 +99,45 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
         if (rect) setSelectedAnchor(rect);
       });
     });
-  }, [setPanel]);
+  }, [setPanel, setSelectedFlowNodeId]);
 
   const handleFlowSelectionChange = useCallback(({ nodes: selectedNodes }: OnSelectionChangeParams) => {
+    if (isClearingSelectionRef.current) {
+      if (selectedNodes.length > 0) setSelectedFlowNodeId(null);
+      return;
+    }
+
     const selectedFlowNode = selectedNodes[0] as Node<FlowNodeData> | undefined;
     if (!selectedFlowNode || selectedFlowNode.id === selectedNodeId) return;
     selectNodeById(selectedFlowNode.id, selectedFlowNode.data.kind);
-  }, [selectNodeById, selectedNodeId]);
+  }, [selectNodeById, selectedNodeId, setSelectedFlowNodeId]);
 
   const handleNodeClick = useCallback((node: Node<FlowNodeData>) => {
     setNodePopover(null);
     setPanel(null);
-    setSelectedNodeId(node.id);
+    setSelectedFlowNodeId(node.id);
     const nodeElement = document.querySelector(`[data-id="${node.id}"]`);
     if (nodeElement) setSelectedAnchor(rectFromElement(nodeElement));
     setSelectedVideoId(node.data.kind === 'video' ? node.id : null);
-  }, [setPanel]);
+  }, [setPanel, setSelectedFlowNodeId]);
 
   const handlePaneClick = useCallback(() => {
-    setSelectedVideoId(null);
-    setSelectedNodeId(null);
-    setSelectedAnchor(null);
-    setNodePopover(null);
-  }, []);
+    clearSelection();
+  }, [clearSelection]);
 
   useEffect(() => {
     const handleNodeSelect = (event: Event) => {
       const detail = (event as CustomEvent<{ id: string; kind: FlowNodeData['kind']; anchor?: AnchorRect }>).detail;
       setNodePopover(null);
       setPanel(null);
-      setSelectedNodeId(detail.id);
+      setSelectedFlowNodeId(detail.id);
       if (detail.anchor) setSelectedAnchor(detail.anchor);
       setSelectedVideoId(detail.kind === 'video' ? detail.id : null);
     };
 
     window.addEventListener('prototype-node-select', handleNodeSelect);
     return () => window.removeEventListener('prototype-node-select', handleNodeSelect);
-  }, [setPanel]);
+  }, [setPanel, setSelectedFlowNodeId]);
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((currentEdges) => addEdge({ ...params, type: 'pulse', animated: true }, currentEdges)),
@@ -195,7 +218,7 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
     setNodePopover,
     setPanelState,
     setSelectedAnchor,
-    setSelectedNodeId,
+    setSelectedNodeId: setSelectedFlowNodeId,
     setSelectedVideoId,
     zoomPercent: viewport.zoomPercent,
   });
@@ -204,7 +227,7 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
     activeSelectedNode,
     addWorkflowNode,
     arrangeCanvas,
-    clearSelection: handlePaneClick,
+    clearSelection,
     defaultViewport: viewport.defaultViewport,
     displayEdges,
     exportCanvas: importExport.exportCanvas,

@@ -36,6 +36,7 @@ export function useEditorRouteState({
   setSelectedVideoId,
   zoomPercent,
 }: UseEditorRouteStateInput) {
+  const consumedRouteNodeIdRef = useRef<string | null | undefined>(undefined);
   const selectedNodeIdRef = useRef(selectedNodeId);
   const zoomPercentRef = useRef(zoomPercent);
 
@@ -58,9 +59,13 @@ export function useEditorRouteState({
 
   useEffect(() => {
     const nextNodeId = routeState?.nodeId ?? null;
+    const nextNode = nextNodeId ? nodes.find((node) => node.id === nextNodeId) : undefined;
+    if (nextNodeId && !nextNode) return;
+    if (nextNodeId === consumedRouteNodeIdRef.current) return;
+
+    consumedRouteNodeIdRef.current = nextNodeId;
     if (nextNodeId === selectedNodeIdRef.current) return;
 
-    const nextNode = nextNodeId ? nodes.find((node) => node.id === nextNodeId) : undefined;
     setSelectedNodeId(nextNode?.id ?? null);
     setSelectedVideoId(nextNode?.data.kind === 'video' ? nextNode.id : null);
     setSelectedAnchor(null);

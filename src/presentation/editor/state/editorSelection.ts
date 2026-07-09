@@ -11,6 +11,22 @@ export function createInitialCanvasNodes(
   }));
 }
 
+export function markSelectedCanvasNode(
+  nodes: Node<FlowNodeData>[],
+  selectedNodeId: string | null,
+): Node<FlowNodeData>[] {
+  let changed = false;
+  const nextNodes = nodes.map((node) => {
+    const selected = node.id === selectedNodeId;
+    if (node.selected === selected) return node;
+
+    changed = true;
+    return { ...node, selected };
+  });
+
+  return changed ? nextNodes : nodes;
+}
+
 export function getVideoNodeId(nodes: Node<FlowNodeData>[], selectedNodeId: string | null): string | null {
   if (!selectedNodeId) return null;
   const selectedNode = nodes.find((node) => node.id === selectedNodeId);

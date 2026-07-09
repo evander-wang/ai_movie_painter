@@ -1,5 +1,19 @@
 import { useEffect } from 'react';
 
+type HandleBaseOffset = {
+  x: number;
+  y: number;
+};
+
+export function getMagneticHandleBaseOffset(className: string, width: number, height: number): HandleBaseOffset {
+  const isSourceHandle = className.includes('node-handle-source') || className.includes('react-flow__handle-right');
+
+  return {
+    x: isSourceHandle ? width / 2 : -width / 2,
+    y: -height / 2,
+  };
+}
+
 export function useMagneticHandles(isConnecting: boolean) {
   useEffect(() => {
     let frame = 0;
@@ -55,11 +69,14 @@ export function useMagneticHandles(isConnecting: boolean) {
       if (closestHandle) {
         closestHandle.style.setProperty('--magnet-x', `${closestOffset.x.toFixed(2)}px`);
         closestHandle.style.setProperty('--magnet-y', `${closestOffset.y.toFixed(2)}px`);
-        const baseX = -closestHandle.offsetWidth / 2;
-        const baseY = -closestHandle.offsetHeight / 2;
+        const baseOffset = getMagneticHandleBaseOffset(
+          closestHandle.className,
+          closestHandle.offsetWidth,
+          closestHandle.offsetHeight,
+        );
         closestHandle.style.setProperty(
           'transform',
-          `translate(${(baseX + closestOffset.x).toFixed(2)}px, ${(baseY + closestOffset.y).toFixed(2)}px) scale(${isConnecting ? 1.28 : 1.16})`,
+          `translate(${(baseOffset.x + closestOffset.x).toFixed(2)}px, ${(baseOffset.y + closestOffset.y).toFixed(2)}px) scale(${isConnecting ? 1.28 : 1.16})`,
           'important',
         );
       }

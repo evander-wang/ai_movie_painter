@@ -35,7 +35,12 @@ export function NodeAttributePopover({
             <small>{getNodeSubtitle(node)}</small>
           </div>
         </div>
-        <button onClick={onClose}>
+        <button
+          onClick={(event) => {
+            event.stopPropagation();
+            onClose();
+          }}
+        >
           <X size={17} />
         </button>
       </div>
@@ -47,4 +52,3 @@ export function NodeAttributePopover({
     </aside>
   );
 }
-
