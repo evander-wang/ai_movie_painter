@@ -1,0 +1,29 @@
+{
+  "projectConfig": {
+    "app": {
+      "description": "AI video workflow canvas prototype",
+      "displayName": "【镇关】| AIGC非遗特别短片 - 副本",
+      "name": "AI Movie Painter"
+    },
+    "canvas": {
+      "defaultViewport": {
+        "x": 770,
+        "y": 300,
+        "zoom": 0.58
+      },
+      "maxZoom": 1.4,
+      "minZoom": 0.12,
+      "snapGrid": 24
+    },
+    "server": {
+      "host": "0.0.0.0",
+      "port": 5174
+    },
+    "ui": {
+      "accent": "cyan",
+      "nodePulseMode": "active-only",
+      "theme": "dark-cinematic"
+    }
+  },
+  "schemaVersion": "golden/project-config/v1"
+}

@@ -1,20 +1,62 @@
 :root {
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #ecf2f6;
-  background: #101113;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #e9f0f4;
+  background: #0f1113;
   --canvas-bg: #111315;
   --canvas-bg-dot: rgba(153, 178, 194, 0.12);
-  --panel: rgba(31, 33, 36, 0.94);
-  --panel-2: rgba(39, 42, 46, 0.94);
-  --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(255, 255, 255, 0.16);
-  --text: #eef5f8;
-  --muted: #8d969e;
-  --cyan: #15c8e8;
-  --cyan-soft: rgba(21, 200, 232, 0.16);
-  --orange: #f6b84d;
-  --shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+  --surface-0: rgba(17, 19, 21, 0.94);
+  --surface-1: rgba(28, 31, 34, 0.92);
+  --surface-2: rgba(36, 39, 43, 0.94);
+  --surface-3: rgba(46, 50, 55, 0.94);
+  --surface-elevated: rgba(33, 36, 40, 0.97);
+  --surface-glass: rgba(28, 31, 34, 0.82);
+  --surface-field: rgba(255, 255, 255, 0.045);
+  --surface-field-strong: rgba(255, 255, 255, 0.075);
+  --border-subtle: rgba(225, 238, 246, 0.08);
+  --border-regular: rgba(225, 238, 246, 0.12);
+  --border-strong: rgba(225, 238, 246, 0.18);
+  --text-primary: #edf4f7;
+  --text-secondary: #c8d2d8;
+  --text-tertiary: #9ca7af;
+  --text-muted: #7e8992;
+  --accent-cyan: #19c6de;
+  --accent-blue: #54b1ff;
+  --accent-gold: #e6b15d;
+  --accent-green: #68d391;
+  --accent-purple: #a78bfa;
+  --accent-danger: #fb7185;
+  --accent-soft: rgba(25, 198, 222, 0.14);
+  --accent-border: rgba(25, 198, 222, 0.34);
+  --status-success: #69d59b;
+  --status-working: #72d7ff;
+  --status-warning: #e6b15d;
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.26);
+  --shadow-md: 0 14px 42px rgba(0, 0, 0, 0.38);
+  --shadow-lg: 0 20px 64px rgba(0, 0, 0, 0.48);
+  --font-xxs: 10px;
+  --font-xs: 11px;
+  --font-sm: 12px;
+  --font-md: 13px;
+  --font-lg: 14px;
+  --font-xl: 16px;
+  --panel: var(--surface-elevated);
+  --panel-2: var(--surface-2);
+  --line: var(--border-subtle);
+  --line-strong: var(--border-strong);
+  --text: var(--text-primary);
+  --muted: var(--text-tertiary);
+  --cyan: var(--accent-cyan);
+  --cyan-soft: var(--accent-soft);
+  --orange: var(--accent-gold);
+  --shadow: var(--shadow-lg);
 }
 
 * {
@@ -2616,4 +2658,272 @@ kbd {
   .expand-layout {
     grid-template-columns: 1fr;
   }
+}
+
+/* Design system normalization */
+body {
+  color: var(--text-primary);
+  font-size: var(--font-md);
+  line-height: 1.45;
+}
+
+button,
+input,
+textarea,
+select {
+  letter-spacing: 0;
+}
+
+button {
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease,
+    opacity 140ms ease;
+}
+
+.brand-mark,
+.project-name,
+.promo-button,
+.credit-button,
+.avatar-button,
+.center-toolbar,
+.left-status,
+.workflow-rail,
+.popover,
+.side-drawer,
+.shortcut-modal,
+.workflow-panel,
+.node-attribute-popover,
+.selected-video-overlay,
+.bottom-workflow-sheet,
+.video-config-card {
+  border-color: var(--border-subtle);
+  background: var(--surface-glass);
+  box-shadow: var(--shadow-md);
+}
+
+.flow-node {
+  border-color: var(--border-regular);
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, rgba(39, 43, 47, 0.96), rgba(29, 32, 36, 0.96));
+  box-shadow: var(--shadow-sm);
+}
+
+.flow-node.is-selected {
+  border-color: rgba(84, 177, 255, 0.9);
+  box-shadow:
+    0 0 0 1px rgba(84, 177, 255, 0.32),
+    0 14px 42px rgba(0, 0, 0, 0.42);
+}
+
+.node-title,
+.project-name,
+.attribute-title strong,
+.selected-node-card strong,
+.selected-media-node strong,
+.section-title,
+.attribute-section-title,
+.sheet-head span,
+.queue-main strong,
+.shot-card strong {
+  color: var(--text-primary);
+  font-size: var(--font-md);
+  font-weight: 650;
+}
+
+.node-foot,
+.text-preview p,
+.attribute-title small,
+.popover-head small,
+.compact-parameter-grid label > span,
+.slider-row small,
+.config-summary p,
+.queue-main small,
+.shot-card small,
+.sheet-head small,
+.selected-node-card small,
+.selected-media-node small {
+  color: var(--text-tertiary);
+  font-size: var(--font-sm);
+}
+
+.workflow-rail button,
+.center-toolbar button,
+.left-status button,
+.node-more,
+.popover-head button,
+.drawer-head button,
+.modal-head button,
+.attribute-head button,
+.sheet-actions button,
+.queue-row button {
+  color: var(--text-tertiary);
+}
+
+.workflow-rail button:hover,
+.workflow-rail button.active,
+.center-toolbar button:hover,
+.left-status button:hover,
+.center-toolbar button.active,
+.left-status button.active,
+.sheet-actions button:hover,
+.queue-row button:hover {
+  color: #eafcff;
+  background: var(--accent-soft);
+}
+
+.menu-row,
+.node-menu-grid button,
+.segmented-grid button,
+.mini-segment button,
+.lock-list button,
+.attribute-tabs button,
+.chip-grid button,
+.attribute-actions button,
+.structured-list div,
+.negative-prompt,
+.prompt-editor,
+.config-summary,
+.attribute-metrics div,
+.group-overview div,
+.asset-card,
+.character-card,
+.timeline-row,
+.queue-summary div,
+.queue-row {
+  border-color: var(--border-subtle);
+  background: var(--surface-field);
+  color: var(--text-secondary);
+}
+
+.menu-row:hover,
+.node-menu-grid button:hover,
+.segmented-grid button:hover,
+.mini-segment button:hover,
+.lock-list button:hover,
+.attribute-actions button:hover,
+.asset-card:hover,
+.character-card:hover {
+  border-color: var(--accent-border);
+  background: rgba(25, 198, 222, 0.085);
+}
+
+.segmented-grid button.active,
+.mini-segment button.active,
+.lock-list button.active,
+.attribute-tabs button.active,
+.chip-grid button.active {
+  border-color: var(--accent-border);
+  background: rgba(25, 198, 222, 0.13);
+  color: #effcff;
+}
+
+.node-kind.video,
+.attribute-icon.group {
+  color: #bcefff;
+  background: rgba(25, 198, 222, 0.14);
+}
+
+.node-kind.image,
+.attribute-icon.image {
+  color: #ffe0a6;
+  background: rgba(230, 177, 93, 0.15);
+}
+
+.node-kind.text,
+.attribute-icon.text {
+  color: #ddd2ff;
+  background: rgba(167, 139, 250, 0.15);
+}
+
+.node-kind.audio,
+.attribute-icon.audio,
+.pill.ok {
+  color: #baf4d2;
+  background: rgba(104, 211, 145, 0.14);
+}
+
+.node-kind.tool,
+.attribute-icon.tool {
+  color: #ffe0a6;
+  background: rgba(230, 177, 93, 0.14);
+}
+
+.pill {
+  font-size: var(--font-xs);
+  font-weight: 650;
+}
+
+.pill.busy {
+  color: #bcefff;
+  background: rgba(114, 215, 255, 0.13);
+}
+
+.pill.muted {
+  color: var(--text-tertiary);
+  background: var(--surface-field-strong);
+}
+
+.media-preview,
+.config-preview,
+.attribute-preview,
+.selected-media-preview,
+.shot-card-media {
+  border-color: var(--border-regular);
+  background:
+    radial-gradient(circle at 42% 36%, rgba(230, 177, 93, 0.55), transparent 18%),
+    linear-gradient(135deg, rgba(94, 68, 46, 0.95), rgba(182, 134, 76, 0.88) 42%, rgba(49, 74, 56, 0.92) 72%, rgba(16, 19, 21, 0.96)) !important;
+}
+
+.react-flow__node:nth-of-type(3n + 1) .media-preview {
+  background:
+    radial-gradient(circle at 42% 38%, rgba(238, 196, 124, 0.68), transparent 16%),
+    linear-gradient(135deg, #5f4330, #bf9357 45%, #233329 78%, #101315) !important;
+}
+
+.react-flow__node:nth-of-type(3n + 2) .media-preview {
+  background:
+    radial-gradient(circle at 34% 42%, rgba(247, 189, 132, 0.62), transparent 18%),
+    linear-gradient(135deg, #522d28, #9f453a 46%, #2a2220 76%, #111315) !important;
+}
+
+.react-flow__node:nth-of-type(3n) .media-preview {
+  background:
+    radial-gradient(circle at 58% 34%, rgba(205, 222, 185, 0.5), transparent 18%),
+    linear-gradient(135deg, #28392e, #638064 48%, #283129 78%, #111315) !important;
+}
+
+.text-preview,
+.prompt-editor,
+.negative-prompt {
+  background: rgba(15, 17, 19, 0.38);
+  border-color: var(--border-subtle);
+}
+
+.text-preview strong,
+.prompt-editor p,
+.negative-prompt,
+.config-summary p,
+.structured-list strong,
+.attribute-slider strong,
+.slider-row strong {
+  color: var(--text-secondary);
+}
+
+.fake-slider i,
+.queue-progress i {
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+}
+
+.attribute-slider b {
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-gold));
+}
+
+kbd {
+  border-color: var(--border-regular);
+  background: rgba(6, 8, 10, 0.32);
+  color: var(--text-tertiary);
+  font-size: var(--font-xs);
 }

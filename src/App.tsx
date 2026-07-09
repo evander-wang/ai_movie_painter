@@ -74,6 +74,7 @@ import {
   Rows3,
   Timer,
 } from 'lucide-react';
+import { projectConfig } from './config/projectConfig';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type AiNodeType =
@@ -751,49 +752,7 @@ const workflowGroups = [
   },
 ];
 
-function createWorkflowNodes(): Node<FlowNodeData>[] {
-  const nodes: Node<FlowNodeData>[] = [];
-
-  workflowGroups.forEach((group) => {
-    const rows = Math.ceil(group.nodeTypes.length / 2);
-    nodes.push({
-      id: `group-${group.id}`,
-      type: 'mediaNode',
-      position: group.position,
-      data: { title: group.title, kind: 'group', count: group.count, accent: group.accent },
-      style: { width: 920, height: 170 + rows * 210 },
-      zIndex: -10,
-    });
-
-    group.nodeTypes.forEach((nodeType, index) => {
-      const config = nodeCatalog[nodeType];
-      const col = index % 2;
-      const row = Math.floor(index / 2);
-      nodes.push({
-        id: nodeType,
-        type: 'mediaNode',
-        position: {
-          x: group.position.x + 54 + col * 410,
-          y: group.position.y + 76 + row * 210,
-        },
-        data: {
-          title: config.label,
-          kind: config.kind,
-          nodeType,
-          size: config.category,
-          status: nodeType === 'taskQueue' ? 'working' : nodeType === 'music' ? 'muted' : 'ready',
-          accent: config.accent,
-          preview: makeNodePreview(config),
-          body: config.summary,
-        },
-      });
-    });
-  });
-
-  return nodes;
-}
-
-function createDefaultCanvasNodes(): Node<FlowNodeData>[] {
+export function createDefaultCanvasNodes(): Node<FlowNodeData>[] {
   const promptConfig = nodeCatalog.prompt;
   const videoConfig = nodeCatalog.imageToVideo;
   const imageConfig = nodeCatalog.imageReference;
@@ -908,7 +867,7 @@ function chooseOverlayPosition(anchor: AnchorRect, size: OverlaySize): OverlayPo
 
 const initialNodes: Node<FlowNodeData>[] = createDefaultCanvasNodes();
 
-const initialEdges: Edge[] = [
+export const initialEdges: Edge[] = [
   ...Array.from({ length: 10 }, (_, index) => ({
     id: `e-text-image-${index + 1}`,
     source: 'default-text',
@@ -956,7 +915,7 @@ function readCurrentViewport() {
   return {
     x: transform?.e ?? 0,
     y: transform?.f ?? 0,
-    zoom: transform?.a ?? 1,
+    zoom: transform?.a ?? projectConfig.canvas.defaultViewport.zoom,
   };
 }
 
@@ -1028,7 +987,7 @@ function parseImportedCanvas(payload: unknown): {
     ? {
         x: Number(payload.viewport.x) || 0,
         y: Number(payload.viewport.y) || 0,
-        zoom: Number(payload.viewport.zoom) || 0.58,
+        zoom: Number(payload.viewport.zoom) || projectConfig.canvas.defaultViewport.zoom,
       }
     : undefined;
 
@@ -1379,7 +1338,6 @@ function CanvasPrototype() {
 
   const addWorkflowNode = useCallback((nodeType: AiNodeType) => {
     const config = nodeCatalog[nodeType];
-    const canvas = document.querySelector('.react-flow__viewport');
     const currentViewport = readCurrentViewport();
     const zoom = currentViewport.zoom || 0.48;
     const viewportX = currentViewport.x || 0;
@@ -1401,7 +1359,7 @@ function CanvasPrototype() {
     const payload = {
       schemaVersion: 'short-flow-canvas/v1',
       exportedAt: new Date().toISOString(),
-      app: 'Short Flow Canvas Prototype',
+      app: projectConfig.app.name,
       viewport: readCurrentViewport(),
       nodes: nodes.map((node) => ({
         id: node.id,
@@ -1456,7 +1414,7 @@ function CanvasPrototype() {
   }, [reactFlow]);
 
   const resetCanvasView = useCallback(() => {
-    reactFlow.setViewport({ x: 770, y: 300, zoom: 0.58 }, { duration: 260 });
+    reactFlow.setViewport(projectConfig.canvas.defaultViewport, { duration: 260 });
   }, [reactFlow]);
 
   const zoomCanvasTo = useCallback((zoom: number) => {
@@ -1586,15 +1544,15 @@ function CanvasPrototype() {
             setSelectedAnchor(null);
             setNodePopover(null);
           }}
-          defaultViewport={{ x: 770, y: 300, zoom: 0.58 }}
-          minZoom={0.12}
-          maxZoom={1.4}
+          defaultViewport={projectConfig.canvas.defaultViewport}
+          minZoom={projectConfig.canvas.minZoom}
+          maxZoom={projectConfig.canvas.maxZoom}
           snapToGrid={snap}
-          snapGrid={[24, 24]}
+          snapGrid={[projectConfig.canvas.snapGrid, projectConfig.canvas.snapGrid]}
           fitView={false}
           proOptions={{ hideAttribution: true }}
         >
-          <Background variant={BackgroundVariant.Dots} gap={24} size={1.15} />
+          <Background variant={BackgroundVariant.Dots} gap={projectConfig.canvas.snapGrid} size={1.15} />
           <Controls showInteractive={false} position="bottom-right" />
           {showMiniMap && (
             <MiniMap
@@ -1661,7 +1619,7 @@ function TopNav() {
         <div className="brand-mark">
           <Split size={20} />
         </div>
-        <button className="project-name">【镇关】| AIGC非遗特别短片 - 副本</button>
+        <button className="project-name">{projectConfig.app.displayName}</button>
       </div>
       <div className="top-actions">
         <button className="promo-button">
@@ -1876,7 +1834,7 @@ function NodeAttributePopover({
       {config && <ConfigAttributePanel node={node} config={config} />}
       {!config && node.kind === 'image' && <ImageAttributePanel node={node} />}
       {!config && node.kind === 'text' && <TextAttributePanel node={node} />}
-      {!config && node.kind === 'audio' && <AudioAttributePanel node={node} />}
+      {!config && node.kind === 'audio' && <AudioAttributePanel />}
       {!config && node.kind === 'group' && <GroupAttributePanel node={node} />}
     </aside>
   );
@@ -2037,7 +1995,7 @@ function TextAttributePanel({ node }: { node: FlowNodeData }) {
   );
 }
 
-function AudioAttributePanel({ node }: { node: FlowNodeData }) {
+function AudioAttributePanel() {
   return (
     <div className="attribute-body">
       <div className="waveform">

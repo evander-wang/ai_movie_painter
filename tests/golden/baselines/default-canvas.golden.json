@@ -1,0 +1,256 @@
+{
+  "edgeCount": 15,
+  "edges": [
+    {
+      "animated": true,
+      "id": "e-image-video-1",
+      "source": "default-image-1",
+      "target": "default-video",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-image-video-2",
+      "source": "default-image-2",
+      "target": "default-video",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-image-video-3",
+      "source": "default-image-3",
+      "target": "default-video",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-image-video-4",
+      "source": "default-image-4",
+      "target": "default-video",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-image-video-5",
+      "source": "default-image-5",
+      "target": "default-video",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-text-image-1",
+      "source": "default-text",
+      "target": "default-image-1",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-text-image-10",
+      "source": "default-text",
+      "target": "default-image-10",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-text-image-2",
+      "source": "default-text",
+      "target": "default-image-2",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-text-image-3",
+      "source": "default-text",
+      "target": "default-image-3",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-text-image-4",
+      "source": "default-text",
+      "target": "default-image-4",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-text-image-5",
+      "source": "default-text",
+      "target": "default-image-5",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-text-image-6",
+      "source": "default-text",
+      "target": "default-image-6",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-text-image-7",
+      "source": "default-text",
+      "target": "default-image-7",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-text-image-8",
+      "source": "default-text",
+      "target": "default-image-8",
+      "type": "pulse"
+    },
+    {
+      "animated": true,
+      "id": "e-text-image-9",
+      "source": "default-text",
+      "target": "default-image-9",
+      "type": "pulse"
+    }
+  ],
+  "nodeCount": 12,
+  "nodes": [
+    {
+      "id": "default-text",
+      "kind": "text",
+      "nodeType": "prompt",
+      "position": {
+        "x": -860,
+        "y": 170
+      },
+      "status": "ready",
+      "title": "全局分镜 Prompt"
+    },
+    {
+      "id": "default-image-1",
+      "kind": "image",
+      "nodeType": "imageReference",
+      "position": {
+        "x": -380,
+        "y": -250
+      },
+      "status": "ready",
+      "title": "图片参考 1"
+    },
+    {
+      "id": "default-image-2",
+      "kind": "image",
+      "nodeType": "imageReference",
+      "position": {
+        "x": -380,
+        "y": -85
+      },
+      "status": "ready",
+      "title": "图片参考 2"
+    },
+    {
+      "id": "default-image-3",
+      "kind": "image",
+      "nodeType": "imageReference",
+      "position": {
+        "x": -380,
+        "y": 80
+      },
+      "status": "ready",
+      "title": "图片参考 3"
+    },
+    {
+      "id": "default-image-4",
+      "kind": "image",
+      "nodeType": "imageReference",
+      "position": {
+        "x": -380,
+        "y": 245
+      },
+      "status": "ready",
+      "title": "图片参考 4"
+    },
+    {
+      "id": "default-image-5",
+      "kind": "image",
+      "nodeType": "imageReference",
+      "position": {
+        "x": -380,
+        "y": 410
+      },
+      "status": "ready",
+      "title": "图片参考 5"
+    },
+    {
+      "id": "default-image-6",
+      "kind": "image",
+      "nodeType": "imageReference",
+      "position": {
+        "x": -80,
+        "y": -250
+      },
+      "status": "ready",
+      "title": "图片参考 6"
+    },
+    {
+      "id": "default-image-7",
+      "kind": "image",
+      "nodeType": "imageReference",
+      "position": {
+        "x": -80,
+        "y": -85
+      },
+      "status": "ready",
+      "title": "图片参考 7"
+    },
+    {
+      "id": "default-image-8",
+      "kind": "image",
+      "nodeType": "imageReference",
+      "position": {
+        "x": -80,
+        "y": 80
+      },
+      "status": "ready",
+      "title": "图片参考 8"
+    },
+    {
+      "id": "default-image-9",
+      "kind": "image",
+      "nodeType": "imageReference",
+      "position": {
+        "x": -80,
+        "y": 245
+      },
+      "status": "ready",
+      "title": "图片参考 9"
+    },
+    {
+      "id": "default-image-10",
+      "kind": "image",
+      "nodeType": "imageReference",
+      "position": {
+        "x": -80,
+        "y": 410
+      },
+      "status": "ready",
+      "title": "图片参考 10"
+    },
+    {
+      "id": "default-video",
+      "kind": "video",
+      "nodeType": "imageToVideo",
+      "position": {
+        "x": 450,
+        "y": 170
+      },
+      "status": "working",
+      "title": "图生视频合成"
+    }
+  ],
+  "nodesByKind": {
+    "image": 10,
+    "text": 1,
+    "video": 1
+  },
+  "nodesByType": {
+    "imageReference": 10,
+    "imageToVideo": 1,
+    "prompt": 1
+  },
+  "schemaVersion": "golden/default-canvas/v1"
+}

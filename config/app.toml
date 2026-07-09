@@ -1,0 +1,23 @@
+[app]
+name = "AI Movie Painter"
+displayName = "【镇关】| AIGC非遗特别短片 - 副本"
+description = "AI video workflow canvas prototype"
+
+[server]
+host = "0.0.0.0"
+port = 5174
+
+[canvas]
+minZoom = 0.12
+maxZoom = 1.4
+snapGrid = 24
+
+[canvas.defaultViewport]
+x = 770
+y = 300
+zoom = 0.58
+
+[ui]
+theme = "dark-cinematic"
+accent = "cyan"
+nodePulseMode = "active-only"

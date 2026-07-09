@@ -4,8 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
+    "dev": "vite",
+    "typecheck": "tsc -b --noEmit",
+    "test:golden": "vitest run tests/golden",
     "build": "tsc -b && vite build",
+    "check:all": "npm run typecheck && npm run test:golden && npm run build",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
@@ -14,11 +17,13 @@
     "lucide-react": "^0.561.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "smol-toml": "^1.7.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3"
+    "@types/react-dom": "^19.2.3",
+    "vitest": "^4.1.10"
   }
 }
