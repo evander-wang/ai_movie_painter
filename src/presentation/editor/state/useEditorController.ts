@@ -250,6 +250,7 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
     panel,
     resetCanvasView: viewport.resetCanvasView,
     selectedNode,
+    selectedNodeId,
     selectedVideoId,
     setIsConnecting,
     setNodePopover,
