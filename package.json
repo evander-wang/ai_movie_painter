@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc -b --noEmit",
+    "test:unit": "vitest run tests/application",
     "test:golden": "vitest run tests/golden",
     "build": "tsc -b && vite build",
-    "check:all": "npm run typecheck && npm run test:golden && npm run build",
+    "check:all": "npm run typecheck && npm run test:unit && npm run test:golden && npm run build",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {

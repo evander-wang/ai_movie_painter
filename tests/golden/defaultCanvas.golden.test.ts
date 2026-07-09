@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 import { describe, it } from 'vitest';
-import { createDefaultCanvasNodes, initialEdges } from '../../src/App';
+import { createDefaultCanvasNodes, initialEdges } from '../../src/domain/workflow/defaultCanvas';
 import { expectGolden } from './goldenHelper';
 
 describe('default canvas golden', () => {
