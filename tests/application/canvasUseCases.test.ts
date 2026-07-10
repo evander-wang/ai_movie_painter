@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { markActivePathEdges } from '../../src/application/canvas/activePath';
 import { arrangeCanvasNodes } from '../../src/application/canvas/arrangeCanvas';
-import { buildCanvasExportPayload, parseImportedCanvas } from '../../src/application/canvas/importExportCanvas';
+import { isDefaultCanvasState } from '../../src/application/canvas/canvasDraftState';
+import { buildCanvasExportPayload, createCanvasDraftPayload, parseCanvasDraftPayload, parseImportedCanvas } from '../../src/application/canvas/importExportCanvas';
+import { createDefaultCanvasNodes, initialEdges } from '../../src/domain/workflow/defaultCanvas';
+import {
+  CANVAS_DRAFT_STORAGE_KEY,
+  readCanvasDraftPayload,
+  saveCanvasDraft,
+} from '../../src/infrastructure/storage/canvasDraftStorage';
 import type { WorkflowEdge, WorkflowNode } from '../../src/domain/workflow/model';
 
 describe('canvas application use cases', () => {
@@ -17,6 +24,18 @@ describe('canvas application use cases', () => {
       { id: 'b', source: 'image-2', target: 'video', data: { pulseActive: false } },
       { id: 'c', source: 'image-1', target: 'video', data: { pulseActive: true } },
     ]);
+  });
+
+  it('keeps active path edge references stable when pulse state does not change', () => {
+    const activeEdges = markActivePathEdges(
+      [
+        { id: 'a', source: 'prompt', target: 'image-1' },
+        { id: 'b', source: 'image-2', target: 'video' },
+      ],
+      'image-1',
+    );
+
+    expect(markActivePathEdges(activeEdges, 'image-1')).toBe(activeEdges);
   });
 
   it('arranges nodes by workflow kind without changing node identity', () => {
@@ -43,10 +62,16 @@ describe('canvas application use cases', () => {
 
     const exported = buildCanvasExportPayload({
       appName: 'AI Movie Painter',
-      exportedAt: '2026-07-09T00:00:00.000Z',
+      updatedAt: '2026-07-09T00:00:00.000Z',
       viewport: { x: 10, y: 20, zoom: 0.58 },
       nodes,
       edges,
+    });
+
+    expect(exported).toMatchObject({
+      version: 'short-flow-canvas/v1',
+      schemaVersion: 'short-flow-canvas/v1',
+      updatedAt: '2026-07-09T00:00:00.000Z',
     });
 
     expect(parseImportedCanvas(exported, 0.58)).toEqual({
@@ -54,6 +79,72 @@ describe('canvas application use cases', () => {
       edges: [{ ...edges[0], sourceHandle: null, targetHandle: null, label: undefined }],
       viewport: { x: 10, y: 20, zoom: 0.58 },
     });
+  });
+
+  it('saves and loads a canvas draft payload from storage', () => {
+    const storage = createMemoryStorage();
+    const payload = createCanvasDraftPayload({
+      appName: 'AI Movie Painter',
+      nodes: [workflowNode('text-1', 'text')],
+      edges: [],
+      viewport: { x: 12, y: 24, zoom: 0.75 },
+      updatedAt: '2026-07-09T01:00:00.000Z',
+    });
+
+    saveCanvasDraft(storage, payload);
+
+    expect(storage.getItem(CANVAS_DRAFT_STORAGE_KEY)).toContain('"version":"short-flow-canvas/v1"');
+    expect(parseImportedCanvas(readCanvasDraftPayload(storage), 0.58)).toEqual({
+      nodes: [{ ...payload.nodes[0], selected: false }],
+      edges: [],
+      viewport: { x: 12, y: 24, zoom: 0.75 },
+    });
+  });
+
+  it('ignores draft payloads with unsupported schema versions', () => {
+    const storage = createMemoryStorage();
+    storage.setItem(CANVAS_DRAFT_STORAGE_KEY, JSON.stringify({ version: 'short-flow-canvas/v0', nodes: [], edges: [] }));
+
+    expect(parseCanvasDraftPayload(readCanvasDraftPayload(storage), 0.58)).toBeNull();
+  });
+
+  it('ignores invalid draft JSON without removing the current canvas state', () => {
+    const storage = createMemoryStorage();
+    storage.setItem(CANVAS_DRAFT_STORAGE_KEY, '{not valid json');
+
+    expect(readCanvasDraftPayload(storage)).toBeNull();
+    expect(parseCanvasDraftPayload(readCanvasDraftPayload(storage), 0.58)).toBeNull();
+  });
+
+  it('detects the unchanged default canvas state so it does not need a draft', () => {
+    expect(
+      isDefaultCanvasState({
+        edges: initialEdges,
+        nodes: createDefaultCanvasNodes(),
+        viewport: { x: 0, y: 0, zoom: 0.58 },
+        defaultViewport: { x: 0, y: 0, zoom: 0.58 },
+      }),
+    ).toBe(true);
+
+    expect(
+      isDefaultCanvasState({
+        edges: initialEdges,
+        nodes: [...createDefaultCanvasNodes(), workflowNode('new-node', 'image')],
+        viewport: { x: 0, y: 0, zoom: 0.58 },
+        defaultViewport: { x: 0, y: 0, zoom: 0.58 },
+      }),
+    ).toBe(false);
+
+    expect(
+      isDefaultCanvasState({
+        edges: initialEdges,
+        nodes: createDefaultCanvasNodes().map((node) =>
+          node.id === 'default-text' ? { ...node, position: { x: node.position.x + 10, y: node.position.y } } : node,
+        ),
+        viewport: { x: 0, y: 0, zoom: 0.58 },
+        defaultViewport: { x: 0, y: 0, zoom: 0.58 },
+      }),
+    ).toBe(false);
   });
 });
 
@@ -66,5 +157,20 @@ function workflowNode(id: string, kind: WorkflowNode['data']['kind']): WorkflowN
       title: id,
       kind,
     },
+  };
+}
+
+function createMemoryStorage(): Storage {
+  const values = new Map<string, string>();
+
+  return {
+    get length() {
+      return values.size;
+    },
+    clear: () => values.clear(),
+    getItem: (key: string) => values.get(key) ?? null,
+    key: (index: number) => Array.from(values.keys())[index] ?? null,
+    removeItem: (key: string) => values.delete(key),
+    setItem: (key: string, value: string) => values.set(key, value),
   };
 }

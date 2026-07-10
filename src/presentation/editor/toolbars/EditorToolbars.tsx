@@ -1,4 +1,4 @@
-import { Archive, BadgeHelp, Box, Clock3, Download, Grid3X3, Keyboard, Layers3, Library, Minus, MousePointer2, Plus, Rows3, Settings2, Sparkles, Split, Timer, Upload, UserRound, Zap } from 'lucide-react';
+import { Archive, BadgeHelp, Box, Clock3, Download, Grid3X3, Keyboard, Layers3, Library, Minus, MousePointer2, Plus, RotateCcw, Rows3, Settings2, Sparkles, Split, Timer, Upload, UserRound, Zap } from 'lucide-react';
 import { projectConfig } from '@/config/projectConfig';
 import type { Panel } from '@/presentation/editor/editorTypes';
 
@@ -92,6 +92,7 @@ export function LeftStatus({
   onExportCanvas,
   onImportCanvas,
   onArrangeCanvas,
+  onRestoreDefaultCanvas,
   onZoomIn,
   onZoomOut,
   zoomPercent,
@@ -103,6 +104,7 @@ export function LeftStatus({
   onExportCanvas: () => void;
   onImportCanvas: () => void;
   onArrangeCanvas: () => void;
+  onRestoreDefaultCanvas: () => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
   zoomPercent: number;
@@ -115,6 +117,9 @@ export function LeftStatus({
       </button>
       <button title="整理画布" onClick={onArrangeCanvas}>
         <Grid3X3 size={16} />
+      </button>
+      <button title="恢复默认画布" onClick={onRestoreDefaultCanvas}>
+        <RotateCcw size={16} />
       </button>
       <button title="切换小地图" onClick={() => setShowMiniMap((prev) => !prev)}>
         <MousePointer2 size={16} />
@@ -142,5 +147,4 @@ export function LeftStatus({
     </div>
   );
 }
-
 

@@ -7,6 +7,7 @@ export type CanvasExportInput = {
   nodes: WorkflowNode[];
   edges: WorkflowEdge[];
   exportedAt?: string;
+  updatedAt?: string;
 };
 
 export type ImportedCanvas = {
@@ -16,9 +17,13 @@ export type ImportedCanvas = {
 };
 
 export function buildCanvasExportPayload(input: CanvasExportInput) {
+  const updatedAt = input.updatedAt ?? input.exportedAt ?? new Date().toISOString();
+
   return {
+    version: CANVAS_SCHEMA_VERSION,
     schemaVersion: CANVAS_SCHEMA_VERSION,
-    exportedAt: input.exportedAt ?? new Date().toISOString(),
+    exportedAt: updatedAt,
+    updatedAt,
     app: input.appName,
     viewport: input.viewport,
     nodes: input.nodes.map((node) => ({
@@ -43,9 +48,12 @@ export function buildCanvasExportPayload(input: CanvasExportInput) {
   };
 }
 
+export const createCanvasDraftPayload = buildCanvasExportPayload;
+
 export function parseImportedCanvas(payload: unknown, fallbackZoom: number): ImportedCanvas {
   if (!isRecord(payload)) throw new Error('文件不是有效的画布 JSON');
-  if (payload.schemaVersion !== CANVAS_SCHEMA_VERSION) throw new Error('不支持的画布版本');
+  const version = payload.version ?? payload.schemaVersion;
+  if (version !== CANVAS_SCHEMA_VERSION) throw new Error('不支持的画布版本');
   if (!Array.isArray(payload.nodes) || !Array.isArray(payload.edges)) throw new Error('缺少 nodes 或 edges');
 
   return {
@@ -53,6 +61,16 @@ export function parseImportedCanvas(payload: unknown, fallbackZoom: number): Imp
     edges: payload.edges.map(parseWorkflowEdge),
     viewport: parseViewport(payload.viewport, fallbackZoom),
   };
+}
+
+export function parseCanvasDraftPayload(payload: unknown, fallbackZoom: number): ImportedCanvas | null {
+  if (!payload) return null;
+
+  try {
+    return parseImportedCanvas(payload, fallbackZoom);
+  } catch {
+    return null;
+  }
 }
 
 function parseWorkflowNode(rawNode: unknown, index: number): WorkflowNode {

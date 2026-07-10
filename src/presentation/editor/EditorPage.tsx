@@ -6,6 +6,7 @@ import {
   ReactFlow,
   ReactFlowProvider,
 } from '@xyflow/react';
+import { useCallback } from 'react';
 import { projectConfig } from '@/config/projectConfig';
 import type { EditorRouteState } from '@/application/canvas/editorRouteState';
 import { edgeTypes } from '@/presentation/editor/reactflow/edgeTypes';
@@ -16,6 +17,9 @@ import { PanelLayer } from '@/presentation/editor/panels/PanelLayer';
 import { CenterToolbar, LeftStatus, TopNav, WorkflowRail } from '@/presentation/editor/toolbars/EditorToolbars';
 import { nodeTypes } from '@/presentation/editor/reactflow/nodeTypes';
 import { useEditorController } from '@/presentation/editor/state/useEditorController';
+
+const canvasSnapGrid: [number, number] = [projectConfig.canvas.snapGrid, projectConfig.canvas.snapGrid];
+const reactFlowProOptions = { hideAttribution: true };
 
 type EditorPageProps = {
   routeState?: EditorRouteState;
@@ -32,6 +36,8 @@ export function EditorPage(props: EditorPageProps) {
 
 function CanvasPrototype({ routeState, onRouteStateChange }: EditorPageProps) {
   const editor = useEditorController({ routeState, onRouteStateChange });
+  const handleConnectStart = useCallback(() => editor.setIsConnecting(true), [editor.setIsConnecting]);
+  const handleConnectEnd = useCallback(() => editor.setIsConnecting(false), [editor.setIsConnecting]);
 
   return (
     <div className="app-shell">
@@ -64,9 +70,8 @@ function CanvasPrototype({ routeState, onRouteStateChange }: EditorPageProps) {
             onNodesChange={editor.onNodesChange}
             onEdgesChange={editor.onEdgesChange}
             onConnect={editor.onConnect}
-            onConnectStart={() => editor.setIsConnecting(true)}
-            onConnectEnd={() => editor.setIsConnecting(false)}
-            onSelectionChange={editor.handleFlowSelectionChange}
+            onConnectStart={handleConnectStart}
+            onConnectEnd={handleConnectEnd}
             onMove={editor.handleMove}
             onNodeClick={(_, node) => editor.handleNodeClick(node)}
             onPaneClick={editor.handlePaneClick}
@@ -74,9 +79,9 @@ function CanvasPrototype({ routeState, onRouteStateChange }: EditorPageProps) {
             minZoom={projectConfig.canvas.minZoom}
             maxZoom={projectConfig.canvas.maxZoom}
             snapToGrid={editor.snap}
-            snapGrid={[projectConfig.canvas.snapGrid, projectConfig.canvas.snapGrid]}
+            snapGrid={canvasSnapGrid}
             fitView={false}
-            proOptions={{ hideAttribution: true }}
+            proOptions={reactFlowProOptions}
           >
             <Background variant={BackgroundVariant.Dots} gap={projectConfig.canvas.snapGrid} size={1.15} />
             <Controls showInteractive={false} position="bottom-right" />
@@ -100,6 +105,7 @@ function CanvasPrototype({ routeState, onRouteStateChange }: EditorPageProps) {
         onExportCanvas={editor.exportCanvas}
         onImportCanvas={editor.openImportDialog}
         onArrangeCanvas={editor.arrangeCanvas}
+        onRestoreDefaultCanvas={editor.restoreDefaultCanvas}
         onZoomIn={editor.zoomCanvasIn}
         onZoomOut={editor.zoomCanvasOut}
         zoomPercent={editor.zoomPercent}

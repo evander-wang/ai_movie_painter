@@ -6,13 +6,14 @@ import { projectConfig } from '@/config/projectConfig';
 import type { CanvasViewport, FlowNodeData } from '@/domain/workflow/model';
 import { readCurrentViewport } from '@/infrastructure/browser/domGeometry';
 
-export function useCanvasViewport(initialZoom: number) {
+export function useCanvasViewport(initialViewport: CanvasViewport) {
   const reactFlow = useReactFlow<Node<FlowNodeData>, Edge>();
-  const [zoomPercent, setZoomPercent] = useState(Math.round(initialZoom * 100));
+  const [currentViewport, setCurrentViewport] = useState(initialViewport);
+  const [zoomPercent, setZoomPercent] = useState(Math.round(initialViewport.zoom * 100));
 
   const defaultViewport = useMemo(
-    () => ({ ...projectConfig.canvas.defaultViewport, zoom: initialZoom }),
-    [initialZoom],
+    () => initialViewport,
+    [initialViewport],
   );
 
   const readEditorViewport = useCallback(
@@ -25,6 +26,8 @@ export function useCanvasViewport(initialZoom: number) {
   }, [reactFlow]);
 
   const setCanvasViewport = useCallback((viewport: CanvasViewport, duration = 180) => {
+    setCurrentViewport(viewport);
+    setZoomPercent(Math.round(viewport.zoom * 100));
     reactFlow.setViewport(viewport, { duration });
   }, [reactFlow]);
 
@@ -52,6 +55,7 @@ export function useCanvasViewport(initialZoom: number) {
   }, [readEditorViewport, setCanvasViewport]);
 
   const handleMove = useCallback((_event: MouseEvent | TouchEvent | null, viewport: Viewport) => {
+    setCurrentViewport(viewport);
     const nextZoomPercent = Math.round(viewport.zoom * 100);
     setZoomPercent((currentZoomPercent) =>
       currentZoomPercent === nextZoomPercent ? currentZoomPercent : nextZoomPercent,
@@ -61,6 +65,7 @@ export function useCanvasViewport(initialZoom: number) {
   return {
     defaultViewport,
     fitCanvasView,
+    currentViewport,
     handleMove,
     readEditorViewport,
     resetCanvasView,

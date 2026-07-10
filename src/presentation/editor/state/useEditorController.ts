@@ -1,14 +1,16 @@
 import {
   addEdge,
+  type NodeChange,
   type Connection,
   type Edge,
   type Node,
-  type OnSelectionChangeParams,
   useEdgesState,
   useNodesState,
 } from '@xyflow/react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { arrangeCanvasNodes } from '@/application/canvas/arrangeCanvas';
+import { isDefaultCanvasState } from '@/application/canvas/canvasDraftState';
+import { parseCanvasDraftPayload } from '@/application/canvas/importExportCanvas';
 import { markActivePathEdges } from '@/application/canvas/activePath';
 import type { EditorRouteState } from '@/application/canvas/editorRouteState';
 import { createWorkflowNode } from '@/application/workflow/createWorkflowNode';
@@ -17,9 +19,11 @@ import { createDefaultCanvasNodes, initialEdges } from '@/domain/workflow/defaul
 import { nodeCatalog } from '@/domain/workflow/nodeCatalog';
 import type { AiNodeType, FlowNodeData } from '@/domain/workflow/model';
 import { getNodeDomRectById, rectFromElement } from '@/infrastructure/browser/domGeometry';
+import { clearCanvasDraft, getCanvasDraftStorage, readCanvasDraftPayload } from '@/infrastructure/storage/canvasDraftStorage';
 import { chooseOverlayPosition } from '@/shared/geometry/overlayPosition';
 import type { AnchorRect } from '@/shared/geometry/overlayPosition';
 import type { NodePopover, Panel } from '@/presentation/editor/editorTypes';
+import { useCanvasDraftPersistence } from '@/presentation/editor/state/useCanvasDraftPersistence';
 import { useCanvasImportExport } from '@/presentation/editor/state/useCanvasImportExport';
 import { useCanvasViewport } from '@/presentation/editor/state/useCanvasViewport';
 import { createInitialCanvasNodes, getVideoNodeId, markSelectedCanvasNode } from '@/presentation/editor/state/editorSelection';
@@ -35,12 +39,23 @@ type UseEditorControllerInput = {
 };
 
 export function useEditorController({ routeState, onRouteStateChange }: UseEditorControllerInput) {
+  const [storedCanvas] = useState(() => {
+    const storage = getCanvasDraftStorage();
+    const payload = storage ? readCanvasDraftPayload(storage) : null;
+    return parseCanvasDraftPayload(payload, projectConfig.canvas.defaultViewport.zoom);
+  });
   const routeNodeId = routeState?.nodeId ?? null;
-  const initialZoom = routeState?.zoom ?? projectConfig.canvas.defaultViewport.zoom;
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node<FlowNodeData>>(
-    createInitialCanvasNodes(initialNodes, routeNodeId),
+  const initialViewport = useMemo(
+    () => ({
+      ...(storedCanvas?.viewport ?? projectConfig.canvas.defaultViewport),
+      zoom: routeState?.zoom ?? storedCanvas?.viewport?.zoom ?? projectConfig.canvas.defaultViewport.zoom,
+    }),
+    [routeState?.zoom, storedCanvas?.viewport],
   );
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialFlowEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<FlowNodeData>>(
+    createInitialCanvasNodes((storedCanvas?.nodes as Node<FlowNodeData>[] | undefined) ?? initialNodes, routeNodeId),
+  );
+  const [edges, setEdges, onEdgesChange] = useEdgesState((storedCanvas?.edges as Edge[] | undefined) ?? initialFlowEdges);
   const [panel, setPanelState] = useState<Panel>(routeState?.panel ?? null);
   const [nodePopover, setNodePopover] = useState<NodePopover>(null);
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(() =>
@@ -51,10 +66,26 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
   const [showMiniMap, setShowMiniMap] = useState(false);
   const [snap, setSnap] = useState(true);
   const [isConnecting, setIsConnecting] = useState(false);
-  const isClearingSelectionRef = useRef(false);
-  const viewport = useCanvasViewport(initialZoom);
+  const viewport = useCanvasViewport(initialViewport);
+  const isDefaultCanvas = useMemo(
+    () =>
+      isDefaultCanvasState({
+        defaultViewport: projectConfig.canvas.defaultViewport,
+        edges,
+        nodes,
+        viewport: viewport.currentViewport,
+      }),
+    [edges, nodes, viewport.currentViewport],
+  );
 
   useMagneticHandles(isConnecting);
+  useCanvasDraftPersistence({
+    edges,
+    enabled: true,
+    isDefaultCanvas,
+    nodes,
+    viewport: viewport.currentViewport,
+  });
 
   const setPanel = useCallback((nextPanel: Panel) => {
     setPanelState(nextPanel);
@@ -65,6 +96,13 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
     setNodes((currentNodes) => markSelectedCanvasNode(currentNodes, id));
   }, [setNodes]);
 
+  const handleNodesChange = useCallback((changes: NodeChange<Node<FlowNodeData>>[]) => {
+    const nonSelectionChanges = changes.filter((change) => change.type !== 'select');
+    if (nonSelectionChanges.length === 0) return;
+
+    onNodesChange(nonSelectionChanges);
+  }, [onNodesChange]);
+
   const resetEditorState = useCallback(() => {
     setSelectedFlowNodeId(null);
     setSelectedVideoId(null);
@@ -74,18 +112,10 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
   }, [setPanel, setSelectedFlowNodeId]);
 
   const clearSelection = useCallback(() => {
-    isClearingSelectionRef.current = true;
     setSelectedVideoId(null);
     setSelectedFlowNodeId(null);
     setSelectedAnchor(null);
     setNodePopover(null);
-
-    requestAnimationFrame(() => {
-      setSelectedFlowNodeId(null);
-      requestAnimationFrame(() => {
-        isClearingSelectionRef.current = false;
-      });
-    });
   }, [setSelectedFlowNodeId]);
 
   const selectNodeById = useCallback((id: string, kind: FlowNodeData['kind']) => {
@@ -100,17 +130,6 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
       });
     });
   }, [setPanel, setSelectedFlowNodeId]);
-
-  const handleFlowSelectionChange = useCallback(({ nodes: selectedNodes }: OnSelectionChangeParams) => {
-    if (isClearingSelectionRef.current) {
-      if (selectedNodes.length > 0) setSelectedFlowNodeId(null);
-      return;
-    }
-
-    const selectedFlowNode = selectedNodes[0] as Node<FlowNodeData> | undefined;
-    if (!selectedFlowNode || selectedFlowNode.id === selectedNodeId) return;
-    selectNodeById(selectedFlowNode.id, selectedFlowNode.data.kind);
-  }, [selectNodeById, selectedNodeId, setSelectedFlowNodeId]);
 
   const handleNodeClick = useCallback((node: Node<FlowNodeData>) => {
     setNodePopover(null);
@@ -152,6 +171,7 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
   const addWorkflowNode = useCallback((nodeType: AiNodeType) => {
     const config = nodeCatalog[nodeType];
     const id = `${nodeType}-${Date.now().toString(36)}`;
+    const sourceNodeId = selectedNodeId;
     const nextNode = createWorkflowNode({
       id,
       nodeType,
@@ -162,12 +182,23 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
       },
     }) as Node<FlowNodeData>;
 
-    setNodes((currentNodes): Node<FlowNodeData>[] => [
-      ...currentNodes.map((node) => ({ ...node, selected: false })),
-      nextNode,
-    ]);
+    setNodes((currentNodes): Node<FlowNodeData>[] => [...currentNodes, { ...nextNode, selected: false }]);
+    if (sourceNodeId) {
+      setEdges((currentEdges) =>
+        addEdge(
+          {
+            animated: true,
+            id: `e-${sourceNodeId}-${id}`,
+            source: sourceNodeId,
+            target: id,
+            type: 'pulse',
+          },
+          currentEdges,
+        ),
+      );
+    }
     selectNodeById(id, config.kind);
-  }, [selectNodeById, setNodes, viewport]);
+  }, [selectNodeById, selectedNodeId, setEdges, setNodes, viewport]);
 
   const arrangeCanvas = useCallback(() => {
     setNodes((currentNodes) => arrangeCanvasNodes(currentNodes));
@@ -175,6 +206,16 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
       requestAnimationFrame(viewport.fitCanvasView);
     });
   }, [setNodes, viewport.fitCanvasView]);
+
+  const restoreDefaultCanvas = useCallback(() => {
+    const storage = getCanvasDraftStorage();
+    if (storage) clearCanvasDraft(storage);
+
+    setNodes(createInitialCanvasNodes(initialNodes, null));
+    setEdges(initialFlowEdges);
+    resetEditorState();
+    viewport.setCanvasViewport(projectConfig.canvas.defaultViewport, 260);
+  }, [resetEditorState, setEdges, setNodes, viewport]);
 
   const selectedNode = useMemo(
     () =>
@@ -232,7 +273,6 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
     displayEdges,
     exportCanvas: importExport.exportCanvas,
     fitCanvasView: viewport.fitCanvasView,
-    handleFlowSelectionChange,
     handleMove: viewport.handleMove,
     handleNodeClick,
     handlePaneClick,
@@ -244,11 +284,12 @@ export function useEditorController({ routeState, onRouteStateChange }: UseEdito
     edges: displayEdges,
     onConnect,
     onEdgesChange,
-    onNodesChange,
+    onNodesChange: handleNodesChange,
     openImportDialog: importExport.openImportDialog,
     overlayPosition,
     panel,
     resetCanvasView: viewport.resetCanvasView,
+    restoreDefaultCanvas,
     selectedNode,
     selectedNodeId,
     selectedVideoId,
