@@ -1,0 +1,154 @@
+{
+  "edgeCount": 15,
+  "edges": [
+    {
+      "id": "e-image-video-1",
+      "source": "default-image-1",
+      "target": "default-video"
+    },
+    {
+      "id": "e-image-video-2",
+      "source": "default-image-2",
+      "target": "default-video"
+    },
+    {
+      "id": "e-image-video-3",
+      "source": "default-image-3",
+      "target": "default-video"
+    },
+    {
+      "id": "e-image-video-4",
+      "source": "default-image-4",
+      "target": "default-video"
+    },
+    {
+      "id": "e-image-video-5",
+      "source": "default-image-5",
+      "target": "default-video"
+    },
+    {
+      "id": "e-text-image-1",
+      "source": "default-text",
+      "target": "default-image-1"
+    },
+    {
+      "id": "e-text-image-10",
+      "source": "default-text",
+      "target": "default-image-10"
+    },
+    {
+      "id": "e-text-image-2",
+      "source": "default-text",
+      "target": "default-image-2"
+    },
+    {
+      "id": "e-text-image-3",
+      "source": "default-text",
+      "target": "default-image-3"
+    },
+    {
+      "id": "e-text-image-4",
+      "source": "default-text",
+      "target": "default-image-4"
+    },
+    {
+      "id": "e-text-image-5",
+      "source": "default-text",
+      "target": "default-image-5"
+    },
+    {
+      "id": "e-text-image-6",
+      "source": "default-text",
+      "target": "default-image-6"
+    },
+    {
+      "id": "e-text-image-7",
+      "source": "default-text",
+      "target": "default-image-7"
+    },
+    {
+      "id": "e-text-image-8",
+      "source": "default-text",
+      "target": "default-image-8"
+    },
+    {
+      "id": "e-text-image-9",
+      "source": "default-text",
+      "target": "default-image-9"
+    }
+  ],
+  "nodeCount": 12,
+  "nodes": [
+    {
+      "id": "default-image-1",
+      "kind": "image",
+      "nodeType": "imageReference"
+    },
+    {
+      "id": "default-image-10",
+      "kind": "image",
+      "nodeType": "imageReference"
+    },
+    {
+      "id": "default-image-2",
+      "kind": "image",
+      "nodeType": "imageReference"
+    },
+    {
+      "id": "default-image-3",
+      "kind": "image",
+      "nodeType": "imageReference"
+    },
+    {
+      "id": "default-image-4",
+      "kind": "image",
+      "nodeType": "imageReference"
+    },
+    {
+      "id": "default-image-5",
+      "kind": "image",
+      "nodeType": "imageReference"
+    },
+    {
+      "id": "default-image-6",
+      "kind": "image",
+      "nodeType": "imageReference"
+    },
+    {
+      "id": "default-image-7",
+      "kind": "image",
+      "nodeType": "imageReference"
+    },
+    {
+      "id": "default-image-8",
+      "kind": "image",
+      "nodeType": "imageReference"
+    },
+    {
+      "id": "default-image-9",
+      "kind": "image",
+      "nodeType": "imageReference"
+    },
+    {
+      "id": "default-text",
+      "kind": "text",
+      "nodeType": "prompt"
+    },
+    {
+      "id": "default-video",
+      "kind": "video",
+      "nodeType": "imageToVideo"
+    }
+  ],
+  "nodesByKind": {
+    "image": 10,
+    "text": 1,
+    "video": 1
+  },
+  "nodesByType": {
+    "imageReference": 10,
+    "imageToVideo": 1,
+    "prompt": 1
+  },
+  "schemaVersion": "golden/default-canvas-topology/v1"
+}

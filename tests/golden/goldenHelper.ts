@@ -8,8 +8,13 @@ export function stableJson(value: unknown): string {
 
 export function expectGolden(actual: unknown, goldenPath: string): void {
   const actualJson = stableJson(actual);
+  const shouldUpdate = process.env.UPDATE_GOLDEN === '1';
 
-  if (process.env.UPDATE_GOLDEN === '1') {
+  if (shouldUpdate && isContinuousIntegration()) {
+    throw new Error('Golden baselines cannot be updated in CI. Regenerate and review them locally.');
+  }
+
+  if (shouldUpdate) {
     mkdirSync(dirname(goldenPath), { recursive: true });
     writeFileSync(goldenPath, actualJson);
     return;
@@ -32,6 +37,11 @@ export function expectGolden(actual: unknown, goldenPath: string): void {
         `${error instanceof Error ? error.message : String(error)}`,
     );
   }
+}
+
+function isContinuousIntegration(): boolean {
+  const value = process.env.CI?.trim().toLowerCase();
+  return Boolean(value && value !== '0' && value !== 'false');
 }
 
 function sortValue(value: unknown): unknown {

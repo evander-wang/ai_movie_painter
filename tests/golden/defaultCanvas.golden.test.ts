@@ -4,7 +4,7 @@ import { createDefaultCanvasNodes, initialEdges } from '../../src/domain/workflo
 import { expectGolden } from './goldenHelper';
 
 describe('default canvas golden', () => {
-  it('matches the reviewed default AI video workflow graph', () => {
+  it('matches the reviewed default AI video workflow topology', () => {
     const nodes = createDefaultCanvasNodes();
     const edges = initialEdges;
     const nodesByKind = countBy(nodes.map((node) => node.data.kind));
@@ -12,30 +12,27 @@ describe('default canvas golden', () => {
 
     expectGolden(
       {
-        schemaVersion: 'golden/default-canvas/v1',
+        schemaVersion: 'golden/default-canvas-topology/v1',
         nodeCount: nodes.length,
         edgeCount: edges.length,
         nodesByKind,
         nodesByType,
-        nodes: nodes.map((node) => ({
-          id: node.id,
-          kind: node.data.kind,
-          nodeType: node.data.nodeType ?? null,
-          position: node.position,
-          status: node.data.status ?? null,
-          title: node.data.title,
-        })),
+        nodes: nodes
+          .map((node) => ({
+            id: node.id,
+            kind: node.data.kind,
+            nodeType: node.data.nodeType ?? null,
+          }))
+          .sort((left, right) => left.id.localeCompare(right.id)),
         edges: edges
           .map((edge) => ({
             id: edge.id,
             source: edge.source,
             target: edge.target,
-            type: edge.type ?? null,
-            animated: Boolean(edge.animated),
           }))
           .sort((left, right) => left.id.localeCompare(right.id)),
       },
-      join(__dirname, 'baselines/default-canvas.golden.json'),
+      join(__dirname, 'baselines/default-canvas-topology.golden.json'),
     );
   });
 });

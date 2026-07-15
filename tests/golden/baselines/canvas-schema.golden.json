@@ -1,38 +1,69 @@
 {
-  "app": "AI Movie Painter",
-  "edgeCount": 15,
-  "firstEdge": {
-    "animated": true,
-    "id": "e-text-image-1",
-    "source": "default-text",
-    "target": "default-image-1",
-    "type": "pulse"
-  },
-  "firstNode": {
-    "data": {
-      "accent": "#8b5cf6",
-      "body": "非遗主题短片：老屋书房，清晨暖金色自然光，爷爷与孙子只拍手、脚、背影、肩以下。桌面依次展示布老虎、泥塑钟馗、纸鸢等道具，全程无背景音乐。",
-      "kind": "text",
-      "nodeType": "prompt",
-      "size": "文本节点",
-      "status": "ready",
-      "title": "全局分镜 Prompt"
-    },
-    "id": "default-text",
-    "position": {
-      "x": -860,
-      "y": 170
-    },
-    "selected": false,
-    "type": "mediaNode"
-  },
-  "nodeCount": 12,
-  "schemaVersion": "short-flow-canvas/v1",
-  "updatedAt": "2026-07-09T00:00:00.000Z",
-  "version": "short-flow-canvas/v1",
-  "viewport": {
-    "x": 770,
-    "y": 300,
-    "zoom": 0.58
+  "goldenSchemaVersion": "golden/canvas-schema/v2",
+  "payload": {
+    "app": "Golden Canvas Fixture",
+    "edges": [
+      {
+        "animated": true,
+        "id": "edge-full",
+        "label": "完整连线",
+        "source": "node-minimal",
+        "sourceHandle": "source-right",
+        "target": "node-full",
+        "targetHandle": "target-left",
+        "type": "pulse"
+      },
+      {
+        "animated": false,
+        "id": "edge-minimal",
+        "source": "node-full",
+        "target": "node-minimal"
+      }
+    ],
+    "exportedAt": "2026-07-09T00:00:00.000Z",
+    "nodes": [
+      {
+        "data": {
+          "accent": "#38bdf8",
+          "body": "用于锁定完整节点导出字段。",
+          "count": 3,
+          "kind": "video",
+          "nodeType": "imageToVideo",
+          "preview": "fixture-preview",
+          "size": "16:9 · 4s",
+          "status": "working",
+          "title": "完整节点"
+        },
+        "height": 180,
+        "id": "node-full",
+        "position": {
+          "x": 24,
+          "y": 48
+        },
+        "selected": true,
+        "type": "mediaNode",
+        "width": 320
+      },
+      {
+        "data": {
+          "kind": "text",
+          "title": "最小节点"
+        },
+        "id": "node-minimal",
+        "position": {
+          "x": 400,
+          "y": 48
+        },
+        "selected": false
+      }
+    ],
+    "schemaVersion": "short-flow-canvas/v1",
+    "updatedAt": "2026-07-09T00:00:00.000Z",
+    "version": "short-flow-canvas/v1",
+    "viewport": {
+      "x": 120,
+      "y": -80,
+      "zoom": 0.75
+    }
   }
 }
