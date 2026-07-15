@@ -1,11 +1,12 @@
 import { Handle, type Node, type NodeProps, Position } from '@xyflow/react';
 import { Film, ImageIcon, MessageSquareText, MoreHorizontal, Settings2, Video, Zap } from 'lucide-react';
+import { memo } from 'react';
 import type React from 'react';
 import { nodeCatalog } from '@/domain/workflow/nodeCatalog';
 import type { FlowNodeData } from '@/domain/workflow/model';
 import { rectFromElement } from '@/infrastructure/browser/domGeometry';
 
-export function MediaNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
+function MediaNodeComponent({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
   const isGroup = data.kind === 'group';
   const config = data.nodeType ? nodeCatalog[data.nodeType] : undefined;
   const emitSelection = (event: React.MouseEvent<HTMLElement>) => {
@@ -79,3 +80,5 @@ export function MediaNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>)
     </div>
   );
 }
+
+export const MediaNode = memo(MediaNodeComponent);

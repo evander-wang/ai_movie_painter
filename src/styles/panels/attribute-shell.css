@@ -1,0 +1,196 @@
+.node-attribute-popover {
+  position: absolute;
+  left: var(--overlay-left, 50%);
+  top: var(--overlay-top, 47%);
+  z-index: 29;
+  width: min(520px, calc(100vw - 36px));
+  max-height: min(620px, calc(100vh - 112px));
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(35, 36, 38, 0.96);
+  box-shadow: var(--shadow-overlay);
+  backdrop-filter: blur(24px);
+  transform: translate(var(--drag-x, 0px), var(--drag-y, 0px));
+  overflow: hidden;
+}
+
+.draggable-handle {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.draggable-handle:active {
+  cursor: grabbing;
+}
+
+.attribute-head {
+  min-height: 62px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.attribute-title {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.attribute-title div {
+  min-width: 0;
+}
+
+.attribute-title strong,
+.attribute-title small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attribute-title strong {
+  color: #f1f8fb;
+  font-size: 14px;
+}
+
+.attribute-title small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.attribute-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.attribute-icon.image {
+  color: #ffd891;
+  background: rgba(246, 184, 77, 0.16);
+}
+
+.attribute-icon.text {
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.17);
+}
+
+.attribute-icon.audio {
+  color: #87f4c2;
+  background: rgba(16, 185, 129, 0.16);
+}
+
+.attribute-icon.group {
+  color: #94dcff;
+  background: rgba(21, 200, 232, 0.14);
+}
+
+.attribute-icon.tool {
+  color: #ffd891;
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.attribute-head button {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5da;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.editor-error-panel {
+  position: absolute;
+  z-index: 45;
+  left: 50%;
+  top: 50%;
+  width: min(430px, calc(100vw - 36px));
+  min-height: 148px;
+  padding: 16px;
+  border: 1px solid rgba(248, 113, 113, 0.26);
+  border-radius: 14px;
+  background: rgba(31, 32, 35, 0.96);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(22px);
+  transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 12px;
+  color: #eef6f8;
+}
+
+.editor-error-panel.canvas {
+  left: 50%;
+  top: 50%;
+}
+
+.editor-error-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: rgba(248, 113, 113, 0.15);
+  color: #fca5a5;
+  display: grid;
+  place-items: center;
+}
+
+.editor-error-copy {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.editor-error-copy strong {
+  font-size: 14px;
+}
+
+.editor-error-copy span,
+.editor-error-copy small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.editor-error-copy small {
+  max-height: 42px;
+  overflow: hidden;
+  color: #f7b4b4;
+  text-overflow: ellipsis;
+}
+
+.editor-error-actions {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editor-error-actions button {
+  min-height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #dbe7eb;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.editor-error-actions button:hover {
+  border-color: rgba(21, 200, 232, 0.4);
+  background: rgba(21, 200, 232, 0.12);
+}

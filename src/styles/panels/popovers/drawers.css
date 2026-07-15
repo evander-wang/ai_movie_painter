@@ -1,0 +1,249 @@
+.negative-prompt {
+  min-height: 70px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.19);
+  color: #cdd7dc;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.drawer-head {
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.drawer-head small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.drawer-body {
+  padding: 14px;
+  overflow: auto;
+  max-height: 548px;
+}
+
+.search-box {
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 11px;
+  color: #7f8a92;
+}
+
+.search-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.tabs button {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.045);
+  color: #9ba7af;
+  height: 30px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.tabs button.active {
+  color: #e9fbff;
+  background: var(--cyan-soft);
+  border-color: rgba(21, 200, 232, 0.3);
+}
+
+.asset-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.asset-card {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  padding: 6px;
+  color: #d8e1e7;
+  cursor: pointer;
+  text-align: left;
+  min-width: 0;
+}
+
+.asset-card div {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  margin-bottom: 7px;
+}
+
+.asset-card span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.character-list,
+.tool-list,
+.timeline {
+  display: grid;
+  gap: 10px;
+}
+
+.character-card {
+  height: 64px;
+  display: grid;
+  grid-template-columns: 36px 1fr 20px;
+  align-items: center;
+  gap: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--text);
+  text-align: left;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.character-card > span {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+.character-card small {
+  display: block;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.timeline-row {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 10px;
+}
+
+.timeline-row > span {
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--cyan);
+  box-shadow: 0 0 0 4px rgba(21, 200, 232, 0.14);
+}
+
+.timeline-row strong {
+  display: block;
+}
+
+.timeline-row small {
+  color: var(--muted);
+}
+
+.selected-node-card,
+.prompt-box {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.045);
+  padding: 12px;
+}
+
+.selected-node-card span,
+.prompt-box span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.selected-node-card strong {
+  display: block;
+  margin: 5px 0;
+}
+
+.selected-node-card small {
+  color: var(--muted);
+}
+
+.tool-list {
+  grid-template-columns: repeat(4, 1fr);
+  margin: 12px 0;
+}
+
+.tool-list button {
+  height: 58px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.045);
+  color: #d8e1e7;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.tool-list svg {
+  color: var(--cyan);
+}
+
+.prompt-box p {
+  color: #c5ced5;
+  line-height: 1.55;
+  margin: 8px 0 12px;
+}
+
+.prompt-box button {
+  height: 32px;
+  border: 0;
+  border-radius: 9px;
+  background: rgba(21, 200, 232, 0.14);
+  color: #b8f4ff;
+  padding: 0 12px;
+}
+
+.shortcut-modal {
+  width: 520px;
+  max-width: calc(100vw - 32px);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.modal-head p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.shortcut-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.shortcut-list div {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}

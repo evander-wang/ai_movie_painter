@@ -1,0 +1,213 @@
+.side-drawer {
+  position: absolute;
+  right: 26px;
+  bottom: 88px;
+  z-index: 35;
+  width: min(528px, calc(100vw - 52px));
+  max-height: min(620px, calc(100vh - 140px));
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.workflow-panel {
+  position: absolute;
+  right: 96px;
+  top: 84px;
+  z-index: 36;
+  width: min(468px, calc(100vw - 124px));
+  max-height: calc(100vh - 116px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(31, 33, 36, 0.96);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(26px);
+}
+
+.workflow-body {
+  max-height: calc(100vh - 186px);
+  overflow: auto;
+  padding: 14px;
+}
+
+.parameter-section {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.parameter-section:first-child {
+  padding-top: 0;
+}
+
+.parameter-section:last-child {
+  border-bottom: 0;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: #e5eef2;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.section-title svg {
+  color: var(--cyan);
+}
+
+.segmented-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.segmented-grid button,
+.mini-segment button,
+.lock-list button {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--text-control-muted);
+  cursor: pointer;
+}
+
+.segmented-grid button {
+  height: 34px;
+  border-radius: 9px;
+}
+
+.segmented-grid button.active,
+.mini-segment button.active,
+.lock-list button.active {
+  border-color: rgba(21, 200, 232, 0.34);
+  background: rgba(21, 200, 232, 0.12);
+  color: #effcff;
+}
+
+.compact-parameter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.compact-parameter-grid label {
+  display: grid;
+  gap: 7px;
+}
+
+.compact-parameter-grid label > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.mini-segment {
+  display: flex;
+  min-height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.mini-segment button {
+  flex: 1;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+}
+
+.mini-segment button:last-child {
+  border-right: 0;
+}
+
+.slider-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.slider-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  gap: 8px;
+}
+
+.slider-row strong,
+.slider-row small {
+  display: block;
+}
+
+.slider-row strong {
+  color: #e5eef2;
+  font-size: 13px;
+}
+
+.slider-row small {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.slider-row > span {
+  color: #dce6eb;
+  font-size: 12px;
+  text-align: right;
+}
+
+.fake-slider {
+  grid-column: 1 / -1;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-hover);
+  overflow: hidden;
+}
+
+.fake-slider i,
+.queue-progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #17c6df, #6ee7b7);
+}
+
+.lock-list {
+  display: grid;
+  gap: 8px;
+}
+
+.lock-list button {
+  height: 38px;
+  border-radius: 10px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lock-list i {
+  width: 30px;
+  height: 17px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.12);
+  position: relative;
+}
+
+.lock-list i::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 11px;
+  height: 11px;
+  border-radius: var(--radius-pill);
+  background: #7f8a92;
+}
+
+.lock-list button.active i {
+  background: rgba(21, 200, 232, 0.34);
+}
+
+.lock-list button.active i::after {
+  left: 16px;
+  background: #e9fbff;
+}

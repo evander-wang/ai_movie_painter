@@ -1,7 +1,8 @@
 import { BaseEdge, type EdgeProps, getBezierPath } from '@xyflow/react';
+import { memo } from 'react';
 import type React from 'react';
 
-export function PulseEdge({
+function PulseEdgeComponent({
   id,
   sourceX,
   sourceY,
@@ -41,6 +42,8 @@ export function PulseEdge({
     </g>
   );
 }
+
+export const PulseEdge = memo(PulseEdgeComponent);
 
 function getEdgePhase(id: string) {
   let hash = 2166136261;

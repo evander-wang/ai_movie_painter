@@ -1,17 +1,35 @@
 <claude-mem-context>
 # Memory Context
 
-# [short_flow] recent context, 2026-07-09 2:04pm GMT+8
+# [short_flow] recent context, 2026-07-15 11:56am GMT+8
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
 Fetch details: get_observations([IDs]) | Search: mem-search skill
 
-Stats: 1 obs (134t read) | 0t work
+Stats: 3 obs (672t read) | 0t work
 
 ### Jul 1, 2026
 1 2:46p 🔵 User offered browser login assistance for session
+### Jul 11, 2026
+334 3:48p 🔵 nodeCatalog.ts structure analysis for modular split
+### Jul 12, 2026
+336 1:14p 🔵 Codebase Architecture Analysis Initiated for Short Flow Project
 </claude-mem-context>
+
+## Agent skills
+
+### Issue tracker
+
+Issues are tracked in GitHub Issues for `evander-wang/ai_movie_painter`; external PRs are not a triage request surface. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the default five-label triage vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This repo uses a single-context domain docs layout with root `CONTEXT.md` and `docs/adr/`. See `docs/agents/domain.md`.
 
 ## 项目工程约束
 

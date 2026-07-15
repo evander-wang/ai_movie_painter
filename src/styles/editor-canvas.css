@@ -1,0 +1,146 @@
+.app-shell {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(54, 127, 151, 0.16), transparent 28%),
+    var(--canvas-bg);
+}
+
+.canvas-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+.canvas-notice {
+  position: fixed;
+  left: 50%;
+  top: 88px;
+  z-index: 28;
+  transform: translateX(-50%);
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 10px 14px;
+  border: 1px solid rgba(230, 177, 93, 0.32);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(135deg, rgba(54, 42, 26, 0.96), rgba(29, 32, 35, 0.94)),
+    var(--surface-elevated);
+  box-shadow: var(--shadow-floating);
+  color: var(--text-primary);
+  font-size: var(--font-sm);
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.react-flow {
+  background-color: var(--canvas-bg);
+  --xy-background-pattern-color: var(--canvas-bg-dot);
+  --xy-edge-stroke: rgba(232, 241, 246, 0.42);
+  --xy-edge-stroke-selected: #53f2ae;
+  --xy-connectionline-stroke: #53f2ae;
+}
+
+.react-flow__edge-path {
+  stroke-width: 0.9;
+  stroke-linecap: round;
+  opacity: 0.62;
+}
+
+.react-flow__edge .pulse-edge__base {
+  stroke: rgba(214, 228, 238, 0.42);
+  stroke-width: 0.48px;
+  stroke-linecap: round;
+  stroke-dasharray: 6 8 !important;
+  opacity: 0.68;
+  fill: none;
+  animation: none !important;
+}
+
+.react-flow__edge .pulse-edge__shot-glow,
+.react-flow__edge .pulse-edge__shot-core {
+  stroke-linecap: round;
+  pointer-events: none;
+  animation: edge-firework-shot 5.8s linear infinite !important;
+  animation-delay: calc(var(--edge-phase, 0s) + var(--shot-delay, 0s)) !important;
+}
+
+.react-flow__edge .pulse-edge__shot-glow {
+  stroke: rgba(88, 173, 255, 0.24);
+  stroke-width: 1.7px;
+  stroke-dasharray: 0.9 0.78 0.9 0.78 0.9 0.78 0.9 94.16 !important;
+  stroke-dashoffset: 5.84;
+  opacity: 0.48;
+  filter:
+    drop-shadow(0 0 4px rgba(70, 155, 255, 0.44))
+    drop-shadow(0 0 11px rgba(70, 155, 255, 0.26));
+}
+
+.react-flow__edge .pulse-edge__shot-core {
+  stroke: rgba(84, 177, 255, 0.82);
+  stroke-width: 0.68px;
+  stroke-dasharray: 0.78 0.9 0.78 0.9 0.78 0.9 0.78 94.18 !important;
+  stroke-dashoffset: 5.82;
+  opacity: 0.74;
+  filter:
+    drop-shadow(0 0 2px rgba(115, 198, 255, 0.68))
+    drop-shadow(0 0 5px rgba(47, 133, 220, 0.3));
+}
+
+.react-flow__edge:hover .pulse-edge__base,
+.react-flow__edge.selected .pulse-edge__base,
+.react-flow__edge:focus .pulse-edge__base,
+.pulse-edge.is-selected .pulse-edge__base {
+  stroke: rgba(235, 248, 255, 0.74);
+  stroke-width: 0.9px;
+  opacity: 0.9;
+}
+
+.react-flow__edge:hover .pulse-edge__shot-glow,
+.react-flow__edge.selected .pulse-edge__shot-glow,
+.react-flow__edge:focus .pulse-edge__shot-glow,
+.pulse-edge.is-selected .pulse-edge__shot-glow {
+  stroke: rgba(88, 173, 255, 0.54);
+  stroke-width: 2.3px;
+  filter:
+    drop-shadow(0 0 5px rgba(70, 155, 255, 0.72))
+    drop-shadow(0 0 15px rgba(70, 155, 255, 0.38));
+}
+
+.react-flow__edge:hover .pulse-edge__shot-core,
+.react-flow__edge.selected .pulse-edge__shot-core,
+.react-flow__edge:focus .pulse-edge__shot-core,
+.pulse-edge.is-selected .pulse-edge__shot-core {
+  stroke: rgba(118, 202, 255, 1);
+  stroke-width: 1px;
+}
+
+@keyframes edge-firework-shot {
+  0% {
+    stroke-dashoffset: 5.84;
+  }
+
+  100% {
+    stroke-dashoffset: -100;
+  }
+}
+
+.react-flow__controls {
+  display: none;
+}
+
+.react-flow__minimap {
+  background: rgba(24, 26, 29, 0.86);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  background: rgba(0, 0, 0, 0.25);
+  display: grid;
+  place-items: center;
+}
